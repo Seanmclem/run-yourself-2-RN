@@ -10,9 +10,9 @@ import * as React from 'react';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import TabOneScreen from '../screens/TabOneScreen';
-import TabTwoScreen from '../screens/TabTwoScreen';
-import { BottomTabParamList, TabOneParamList, TabTwoParamList } from '../types';
+import RunTimerScreen from '../screens/RunTimerScreen';
+import HistoryScreen from '../screens/HistoryScreen';
+import { BottomTabParamList, RunTimerScreenTabParamList, TabTwoParamList } from '../types';
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -21,17 +21,17 @@ export default function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="Run Timer"
       tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneNavigator}
+        name="Run Timer"
+        component={RunTimerScreenTabNavigator}
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
         }}
       />
       <BottomTab.Screen
-        name="TabTwo"
+        name="History"
         component={TabTwoNavigator}
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
@@ -49,17 +49,17 @@ function TabBarIcon(props: { name: React.ComponentProps<typeof Ionicons>['name']
 
 // Each tab has its own navigation stack, you can read more about this pattern here:
 // https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
-const TabOneStack = createStackNavigator<TabOneParamList>();
+const RunTimerScreenTabStack = createStackNavigator<RunTimerScreenTabParamList>();
 
-function TabOneNavigator() {
+function RunTimerScreenTabNavigator() {
   return (
-    <TabOneStack.Navigator>
-      <TabOneStack.Screen
-        name="TabOneScreen"
-        component={TabOneScreen}
-        options={{ headerTitle: 'Tab One Title' }}
+    <RunTimerScreenTabStack.Navigator>
+      <RunTimerScreenTabStack.Screen
+        name="RunTimerScreen"
+        component={RunTimerScreen}
+        options={{ headerTitle: 'Run Timer' }}
       />
-    </TabOneStack.Navigator>
+    </RunTimerScreenTabStack.Navigator>
   );
 }
 
@@ -69,9 +69,9 @@ function TabTwoNavigator() {
   return (
     <TabTwoStack.Navigator>
       <TabTwoStack.Screen
-        name="TabTwoScreen"
-        component={TabTwoScreen}
-        options={{ headerTitle: 'Tab Two Title' }}
+        name="HistoryScreen"
+        component={HistoryScreen}
+        options={{ headerTitle: 'Run History' }}
       />
     </TabTwoStack.Navigator>
   );

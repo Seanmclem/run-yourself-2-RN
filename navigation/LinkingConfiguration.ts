@@ -12,14 +12,14 @@ export default {
     screens: {
       Root: {
         screens: {
-          TabOne: {
+          RunTimerScreenTab: {
             screens: {
-              TabOneScreen: 'one',
+              RunTimerScreen: 'one',
             },
           },
           TabTwo: {
             screens: {
-              TabTwoScreen: 'two',
+              HistoryScreen: 'two',
             },
           },
         },
