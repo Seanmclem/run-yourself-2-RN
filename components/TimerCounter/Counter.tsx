@@ -4,6 +4,7 @@ import { Text, View } from '../../components/Themed';
 import { AppButton } from '../AppButton';
 
 import dayjs from 'dayjs'
+import { runOnJS } from 'react-native-reanimated';
 
 // 10 digit timestamp is milliseconds aka unix_timestamp
 // 
@@ -25,84 +26,96 @@ function msDifferenceToCounter(duration: number) {
 
 }
 
-const getMllisecondsFromDate = (newDate: Date) => newDate.getTime()
-
-interface DateTimeDiff {
+interface Lap {
     start: number,
     end?: number,
-    difference?: number,
-}
-
-interface Lap {
-    dateTimeDiff: DateTimeDiff[],
+    duration?: number,
+    totalDuration?: number, // really?
 }
 
 interface Run {
+    overallStart: number,
+    overallEnd?: number,
+    overallDuration?: number;
     laps: Lap[],
+    currentLapIndex: number
     // isDone: boolean,
 }
 
 export const Counter = () => {
-    // const [times, setTimes] = useState<DateTimeDiff[]>([])
-    const [currentTime, setCurrentTime] = useState<number>()
+    const [_, setCurrentTime] = useState<number>() // ticker for state updates
 
-    const [runningTotal, setRunningTotal] = useState<number>(0)
-
+    const [run, setRun] = useState<Run>()
     const [diffInterval, setDiffInterval] = useState<any>(undefined)
-    // const [currentTicker, setCurrentTicker] = useState<{
-    //     time: number,
-    //     diff: number
-    // }>({
-    //     time: 0,
-    //     diff: 0
-    // })
 
-    const hat = useRef<DateTimeDiff>({
+
+    const currentLapRef = useRef<Lap>({
         start: 0
     })
 
+    const getNowTimestamp = () => (new Date()).getTime()
 
     const startTimer = () => {
-        setDiffInterval(setInterval(looper, 50))
+        const newTime = getNowTimestamp()
+        currentLapRef.current = { start: newTime }
+
+        const newRun: Run = {
+            overallStart: newTime,
+            laps: [],
+            currentLapIndex: 0,
+        }
+        setRun(newRun)
+
+        setDiffInterval(setInterval(looper, 50)) // TODO: make a ref..
     }
 
     const looper = () => {
-        const newTime = (new Date()).getTime()
+        const newTime = getNowTimestamp()
 
-        console.log('ran', {
-            ...hat.current,
-        })
+        if (currentLapRef) {
+            const originalStart = currentLapRef.current.start;
 
-        if (hat) {
-            const newStart = hat.current.start || newTime;
-
-            hat.current = {
-                start: newStart,
-                difference: newTime - newStart
+            currentLapRef.current = {
+                start: originalStart,
+                duration: newTime - originalStart
             }
         }
 
         setCurrentTime(newTime)
-
-        // setTimeDiff({
-        //     start: origStart > 0 ? origStart : newTime,
-        //     difference: newTime - (timeDiff.start)
-        // })
     }
 
     const stopTimer = () => {
-        if (true) {
-            hat.current = { start: 0 }
-            clearInterval(diffInterval)
-            setDiffInterval(undefined)
-            setCurrentTime(undefined)
-            // setTimeDiff({
-            //     start: timeDiff.start,
-            //     end: currentTicker.time,
-            //     difference: currentTicker.diff,
-            // })
+        endLap()
+        currentLapRef.current = {
+            start: 0,
+            duration: 0,
+        }
+        clearInterval(diffInterval)
+        setDiffInterval(undefined)
+        setCurrentTime(undefined)
+    }
 
-            //setTimeDiff(undefined) // REMOVE
+    const endLap = () => {
+        currentLapRef.current = {
+            start: currentLapRef.current.start,
+            end: getNowTimestamp(),
+            duration: currentLapRef.current.duration,
+        }
+        if (run) {
+            const newRun: Run = {
+                overallStart: run.overallStart,
+                laps: [...run.laps, currentLapRef.current],
+                currentLapIndex: run.currentLapIndex + 1,
+            }
+            setRun(newRun)
+        }
+    }
+
+    const nextLap = () => {
+        endLap()
+        currentLapRef.current = {
+            start: getNowTimestamp(),
+            duration: 0,
         }
     }
 
@@ -113,31 +126,26 @@ export const Counter = () => {
             <Text>
                 Counter
             </Text>
-            {/* {!!hat?.current?.difference && hat.current.difference > 0 && (
+            {/* {!!currentLapRef?.current?.difference && currentLapRef.current.difference > 0 && (
                 <Text>
-                    { hat?.current?.difference?.toString()}
+                    { currentLapRef?.current?.difference?.toString()}
                 </Text>
             )} */}
-            {!!hat?.current?.difference && hat.current.difference > 0 && (
+            {!!currentLapRef?.current?.duration && currentLapRef.current.duration > 0 && (
                 <Text>
-                    { msDifferenceToCounter(hat.current.difference)}
+                    { msDifferenceToCounter(currentLapRef.current.duration)}
                 </Text>
             )}
-            {/* {timeDiff?.difference && timeDiff.difference > 0 && (
-                <Text>
-                    ticker { timeDiff.difference}
-                </Text>
-            )} */}
-            {/* {timeDiff?.end && (
-                <Text>
-                    { timeDiff.end.toString()}
-                </Text>
-            )} */}
-            {/* {timeDiff?.difference && timeDiff.difference > 0 && (
-                <Text>
-                    ticker { timeDiff.difference}
-                </Text>
-            )} */}
+
+            <View>
+                {run?.laps && (
+                    run.laps.map(lap => (
+                        <Text>
+                            {lap.duration}
+                        </Text>
+                    ))
+                )}
+            </View>
             <AppButton
                 onPress={startTimer}
                 title="Start Timer"
@@ -145,6 +153,10 @@ export const Counter = () => {
             <AppButton
                 onPress={stopTimer}
                 title="Stop Timer"
+            />
+            <AppButton
+                onPress={nextLap}
+                title="LAP"
             />
         </View>
     );
