@@ -1,32 +1,16 @@
 import React, { useRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
-import { AppButton } from '../AppButton';
-
-import dayjs from 'dayjs'
-import { runOnJS } from 'react-native-reanimated';
+import { ButtonArea } from './ButtonArea'
+import { CurrentLapTicker } from './CurrentLapTicker';
+import { LapsList } from './LapsList';
 
 // 10 digit timestamp is milliseconds aka unix_timestamp
 // 
 
-function msDifferenceToCounter(duration: number) {
-    let seconds: string | number = Math.floor((duration / 1000) % 60);
-    let minutes: string | number = Math.floor((duration / (1000 * 60)) % 60);
-    let hours: string | number = Math.floor((duration / (1000 * 60 * 60)) % 24);
-    let milliseconds: string | number = parseInt(((duration % 1000) / 100).toString());
 
-    hours = (hours < 10) ? "0" + hours : hours;
-    minutes = (minutes < 10) ? "0" + minutes : minutes;
-    seconds = (seconds < 10) ? "0" + seconds : seconds;
-    milliseconds = (milliseconds < 10) ? "0" + milliseconds : milliseconds;
 
-    return `${hours !== '00' ? `${hours}:` : ''}${minutes ? `${minutes}:` : ''}${seconds && `${seconds}`}`;
-    // `${seconds}:`
-    //    ${milliseconds.toString()}
-
-}
-
-interface Lap {
+export interface Lap {
     start: number,
     end?: number,
     duration?: number,
@@ -119,44 +103,23 @@ export const Counter = () => {
         }
     }
 
-
+    const isRunning = !(currentLapRef?.current?.start === 0)
 
     return (
         <View style={styles.container}>
-            <Text>
-                Counter
-            </Text>
-            {/* {!!currentLapRef?.current?.difference && currentLapRef.current.difference > 0 && (
-                <Text>
-                    { currentLapRef?.current?.difference?.toString()}
-                </Text>
-            )} */}
-            {!!currentLapRef?.current?.duration && currentLapRef.current.duration > 0 && (
-                <Text>
-                    { msDifferenceToCounter(currentLapRef.current.duration)}
-                </Text>
-            )}
+            <CurrentLapTicker
+                duration={currentLapRef?.current?.duration}
+            />
 
-            <View>
-                {run?.laps && (
-                    run.laps.map(lap => (
-                        <Text>
-                            {lap.duration}
-                        </Text>
-                    ))
-                )}
-            </View>
-            <AppButton
-                onPress={startTimer}
-                title="Start Timer"
+            <LapsList
+                laps={run?.laps}
             />
-            <AppButton
-                onPress={stopTimer}
-                title="Stop Timer"
-            />
-            <AppButton
-                onPress={nextLap}
-                title="LAP"
+
+            <ButtonArea
+                isRunning={isRunning}
+                startTimer={startTimer}
+                nextLap={nextLap}
+                stopTimer={stopTimer}
             />
         </View>
     );
@@ -164,11 +127,9 @@ export const Counter = () => {
 
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
+        margin: 30,
+        flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
     },
-    button: {
-        backgroundColor: '#2d1584',
-    }
 });
