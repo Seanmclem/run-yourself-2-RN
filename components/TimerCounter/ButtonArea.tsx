@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from '../../components/Themed';
 import { AppButton } from '../AppButton';
+import { Spacer } from '../Spacer';
 
 interface props {
     isRunning: boolean;
@@ -26,12 +27,14 @@ export const ButtonArea: React.FC<props> = ({ isRunning, startTimer, nextLap, st
                     <AppButton
                         onPress={nextLap}
                         title="LAP"
-                    // style={} need style prop passed TODO
+                    />
+                    <Spacer
+                        width={50}
+                        height={20}
                     />
                     <AppButton
                         onPress={stopTimer}
                         title="Stop Timer"
-                    // style={} need style prop passed TODO
                     />
                 </>
             )}

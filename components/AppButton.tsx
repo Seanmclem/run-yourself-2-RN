@@ -1,16 +1,17 @@
 import * as React from 'react';
-import { View, Button, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, Button, StyleSheet, TouchableOpacity, Text, ViewStyle } from "react-native";
 
 interface props {
     onPress: any,
-    title: string
+    title: string,
+    styleSpread?: ViewStyle[]
 }
 
-export const AppButton: React.FC<props> = ({ onPress, title }) => (
+export const AppButton: React.FC<props> = ({ onPress, title, styleSpread = [] }) => (
     <TouchableOpacity
         activeOpacity={0.7}
         onPress={onPress}
-        style={styles.appButtonContainer}
+        style={[styles.appButtonContainer, ...styleSpread]}
     >
         <Text style={styles.appButtonText}>{title}</Text>
     </TouchableOpacity>

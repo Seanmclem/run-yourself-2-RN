@@ -23,7 +23,7 @@ interface Run {
     overallDuration?: number;
     laps: Lap[],
     currentLapIndex: number
-    // isDone: boolean,
+    isDone: boolean,
 }
 
 export const Counter = () => {
@@ -69,7 +69,7 @@ export const Counter = () => {
     }
 
     const stopTimer = () => {
-        endLap()
+        endLap(true)
         currentLapRef.current = {
             start: 0,
             duration: 0,
@@ -79,18 +79,26 @@ export const Counter = () => {
         setCurrentTime(undefined)
     }
 
-    const endLap = () => {
+    const endLap = (theEnd?: boolean) => {
         currentLapRef.current = {
             start: currentLapRef.current.start,
             end: getNowTimestamp(),
             duration: currentLapRef.current.duration,
         }
         if (run) {
+            const laps = [...run.laps, currentLapRef.current]
+            const overallDuration = laps.reduce((prev, curr) => prev + (curr.duration || 0), 0)
+
             const newRun: Run = {
                 overallStart: run.overallStart,
-                laps: [...run.laps, currentLapRef.current],
+                laps,
                 currentLapIndex: run.currentLapIndex + 1,
+                overallDuration,
+                isDone: !!theEnd,
             }
+            // ^here, need to save this^ to state-mgr/local-storage/db
+
+            console.log({ overallDuration })
             setRun(newRun)
         }
     }
@@ -113,6 +121,8 @@ export const Counter = () => {
 
             <LapsList
                 laps={run?.laps}
+                isDone={!!run?.isDone}
+                overallDuration={run?.overallDuration}
             />
 
             <ButtonArea
