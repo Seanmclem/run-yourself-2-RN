@@ -16,7 +16,7 @@ export interface Lap {
     duration?: number,
 }
 
-interface Run {
+export interface Run {
     overallStart: number,
     overallEnd?: number,
     overallDuration?: number;
