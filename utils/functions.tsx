@@ -1,3 +1,15 @@
+import { Text } from '../components/Themed';
+import * as React from 'react';
+import { StyleSheet } from 'react-native';
+
+
+const styles = StyleSheet.create({
+    milliseconds: {
+        color: 'darkgray',
+    }
+});
+
+
 export const msDifferenceToCounter = (duration: number, hideMilliseconds?: boolean) => {
     let seconds: string | number = Math.floor((duration / 1000) % 60);
     let minutes: string | number = Math.floor((duration / (1000 * 60)) % 60);
@@ -14,6 +26,6 @@ export const msDifferenceToCounter = (duration: number, hideMilliseconds?: boole
     const ss = `${seconds ? `${seconds}` : ''}`;
     const ms = `${!hideMilliseconds ? `:${milliseconds}` : ''}`
 
-    return `${hh}${mm}${ss}${ms}`;
+    return <Text>{hh}{mm}{ss}<Text style={styles.milliseconds}>{ms}</Text></Text>;
 
 }
