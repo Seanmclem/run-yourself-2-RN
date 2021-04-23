@@ -2,23 +2,35 @@ import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { msDifferenceToCounter } from '../../utils/functions';
+import { Spacer } from '../Spacer';
 
 interface props {
     duration?: number,
+    overallDuration?: number
 }
 
-export const CurrentLapTicker: React.FC<props> = ({ duration }) => {
+export const CurrentLapTicker: React.FC<props> = ({ duration, overallDuration }) => {
     return (
         <View style={styles.container}>
             {!!duration && duration > 0 ? (
                 <Text style={styles.countText}>
-                    { msDifferenceToCounter(duration)}
+                    { msDifferenceToCounter(duration, true)}
                 </Text>
             ) : (
                 <Text style={styles.countText}>
                     00:00
                 </Text>
             )}
+            {overallDuration && overallDuration > 0 && (<>
+                <Spacer
+                    height={2}
+                    width='100%'
+                    color='gray'
+                />
+                <Text style={styles.countText}>
+                    {msDifferenceToCounter(overallDuration, true)}
+                </Text>
+            </>)}
         </View>
     );
 }

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { msDifferenceToCounter } from '../../utils/functions';
+import { Spacer } from '../Spacer';
 import { Lap } from './Counter';
 
 interface props {
@@ -13,25 +14,35 @@ interface props {
 export const LapsList: React.FC<props> = ({ laps, isDone, overallDuration }) => {
     return (
         <View style={styles.container}>
-            {laps ? ([
-                isDone && (
-                    <Text key={55} style={styles.item}>
+            {laps ? (<>
+                {isDone && (<>
+                    <Text style={styles.item}>
                         Run Summary:
                     </Text>
-                ),
-                laps.map((lap, index) => (
+                    <Spacer
+                        height={2}
+                        width='100%'
+                        color='gray'
+                    />
+                </>)}
+                {laps.map((lap, index) => (
                     lap.duration && (
                         <Text key={lap.start} style={styles.item}>
                             Lap {index + 1} - {msDifferenceToCounter(lap.duration)}
                         </Text>
                     )
-                )),
-                (overallDuration && isDone) && (
-                    <Text key={overallDuration} style={[styles.item, styles.footer]}>
-                        Overall: { msDifferenceToCounter(overallDuration)}
+                ))}
+                {(overallDuration && isDone) && (<>
+                    <Spacer
+                        height={2}
+                        width='100%'
+                        color='gray'
+                    />
+                    <Text style={[styles.item]}>
+                        Overall: {msDifferenceToCounter(overallDuration)}
                     </Text>
-                )
-            ]) : (
+                </>)}
+            </>) : (
                 null
             )}
         </View>
@@ -49,7 +60,5 @@ const styles = StyleSheet.create({
         marginVertical: 5,
     },
     footer: {
-        borderTopColor: 'grey',
-        borderTopWidth: 1,
     }
 });

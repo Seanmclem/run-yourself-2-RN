@@ -4,17 +4,20 @@ import { StyleSheet } from 'react-native';
 import { View } from '../components/Themed';
 
 interface props {
-    height?: number,
-    width?: number,
+    height?: number | string,
+    width?: number | string,
+    color?: string,
 }
 
-export const Spacer: React.FC<props> = ({ height, width }) => {
+export const Spacer: React.FC<props> = ({ height, width, color }) => {
     return useMemo(
         () => {
             const styles = StyleSheet.create({
                 container: {
                     height: height || 'auto',
                     width: width || 'auto',
+                    backgroundColor: color || 'transparent',
+                    alignSelf: width === '100%' ? 'stretch' : 'auto',
                 },
             });
 
@@ -22,7 +25,7 @@ export const Spacer: React.FC<props> = ({ height, width }) => {
                 <View style={styles.container}>
                 </View>
             );
-        }, [height, width]
+        }, [height, width, color]
     )
 
 }
