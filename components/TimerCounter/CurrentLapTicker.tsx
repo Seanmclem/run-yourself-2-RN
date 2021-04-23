@@ -6,13 +6,14 @@ import { Spacer } from '../Spacer';
 
 interface props {
     duration?: number,
-    overallDuration?: number
+    overallDuration?: number,
+    isFirstLap: boolean,
 }
 
-export const CurrentLapTicker: React.FC<props> = ({ duration, overallDuration }) => {
+export const CurrentLapTicker: React.FC<props> = ({ duration, overallDuration, isFirstLap }) => {
     return (
         <View style={styles.container}>
-            {!!duration && duration > 0 ? (
+            {(duration && duration > 0) ? (
                 <Text style={styles.countText}>
                     { msDifferenceToCounter(duration, true)}
                 </Text>
@@ -21,16 +22,16 @@ export const CurrentLapTicker: React.FC<props> = ({ duration, overallDuration })
                     00:00
                 </Text>
             )}
-            {overallDuration && overallDuration > 0 && (<>
+            {(isFirstLap && overallDuration && overallDuration > 0) ? (<>
                 <Spacer
                     height={2}
-                    width='100%'
-                    color='gray'
+                    width={150}
+                    color='lightgray'
                 />
                 <Text style={styles.countText}>
                     {msDifferenceToCounter(overallDuration, true)}
                 </Text>
-            </>)}
+            </>) : null}
         </View>
     );
 }

@@ -14,7 +14,6 @@ export interface Lap {
     start: number,
     end?: number,
     duration?: number,
-    totalDuration?: number, // really?
 }
 
 interface Run {
@@ -47,6 +46,7 @@ export const Counter = () => {
             overallStart: newTime,
             laps: [],
             currentLapIndex: 0,
+            isDone: false
         }
         setRun(newRun)
 
@@ -58,10 +58,12 @@ export const Counter = () => {
 
         if (currentLapRef) {
             const originalStart = currentLapRef.current.start;
+            const newDuration = newTime - originalStart;
 
+            debugger
             currentLapRef.current = {
                 start: originalStart,
-                duration: newTime - originalStart
+                duration: newDuration,
             }
         }
 
@@ -85,6 +87,7 @@ export const Counter = () => {
             end: getNowTimestamp(),
             duration: currentLapRef.current.duration,
         }
+        debugger
         if (run) {
             const laps = [...run.laps, currentLapRef.current]
             const overallDuration = laps.reduce((prev, curr) => prev + (curr.duration || 0), 0)
@@ -112,11 +115,16 @@ export const Counter = () => {
     }
 
     const isRunning = !(currentLapRef?.current?.start === 0)
+    const overallDuration = (run?.overallDuration || 0) + (currentLapRef?.current?.duration || 0)
+
+    console.log({ overallDuration })
 
     return (
         <View style={styles.container}>
             <CurrentLapTicker
                 duration={currentLapRef?.current?.duration}
+                overallDuration={overallDuration}
+                isFirstLap={!!run?.laps?.length}
             />
 
             <LapsList

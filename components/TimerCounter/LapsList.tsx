@@ -21,8 +21,8 @@ export const LapsList: React.FC<props> = ({ laps, isDone, overallDuration }) => 
                     </Text>
                     <Spacer
                         height={2}
-                        width='100%'
-                        color='gray'
+                        width={140}
+                        color='lightgray'
                     />
                 </>)}
                 {laps.map((lap, index) => (
@@ -35,8 +35,8 @@ export const LapsList: React.FC<props> = ({ laps, isDone, overallDuration }) => 
                 {(overallDuration && isDone) && (<>
                     <Spacer
                         height={2}
-                        width='100%'
-                        color='gray'
+                        width={140}
+                        color='lightgray'
                     />
                     <Text style={[styles.item]}>
                         Overall: {msDifferenceToCounter(overallDuration)}
