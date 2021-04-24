@@ -21,7 +21,7 @@ export default function HistoryScreen() {
           const overallDate = (new Date(run.overallStart))
           const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
           return (
-            <Text>
+            <Text key={run.overallStart}>
               {`${formattedOverallDateString} - Total: `} {msDifferenceToCounter(run.overallDuration || 0)}
             </Text>
           )
