@@ -1,17 +1,32 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 
-import EditScreenInfo from '../components/EditScreenInfo';
+import { runHistory } from '../stores/asyncStore'
+import { useSnapshot } from 'valtio'
+
 import { Text, View } from '../components/Themed';
+import { msDifferenceToCounter } from '../utils/functions';
+import dayjs from 'dayjs';
 
 export default function HistoryScreen() {
+  const runHistorySnap = useSnapshot(runHistory)
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
         Yo Run History
       </Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/HistoryScreen.tsx" />
+      <View>
+        {runHistorySnap.runs.map(run => {
+          const overallDate = (new Date(run.overallStart))
+          const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
+          return (
+            <Text>
+              {`${formattedOverallDateString} - Total: `} {msDifferenceToCounter(run.overallDuration || 0)}
+            </Text>
+          )
+        })}
+      </View>
     </View>
   );
 }

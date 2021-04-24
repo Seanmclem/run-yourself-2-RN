@@ -8,7 +8,7 @@ import { LapsList } from './LapsList';
 // 10 digit timestamp is milliseconds aka unix_timestamp
 // 
 
-
+import { storeData } from '../../stores/asyncStore'
 
 export interface Lap {
     start: number,
@@ -60,7 +60,6 @@ export const Counter = () => {
             const originalStart = currentLapRef.current.start;
             const newDuration = newTime - originalStart;
 
-            debugger
             currentLapRef.current = {
                 start: originalStart,
                 duration: newDuration,
@@ -71,7 +70,11 @@ export const Counter = () => {
     }
 
     const stopTimer = () => {
-        endLap(true)
+        const newRun = endLap(true)
+        if (newRun) {
+            storeData({ newRun })
+        }
+
         currentLapRef.current = {
             start: 0,
             duration: 0,
@@ -103,6 +106,8 @@ export const Counter = () => {
 
             console.log({ overallDuration })
             setRun(newRun)
+
+            return newRun
         }
     }
 

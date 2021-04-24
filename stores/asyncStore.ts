@@ -6,7 +6,7 @@ interface RunHistory {
     runs: Run[],
     runInProgress?: Run,
 }
-const runHistory = proxy<RunHistory>({
+export const runHistory = proxy<RunHistory>({
     runs: [],
     runInProgress: undefined,
 })
@@ -20,6 +20,8 @@ export const storeData = async ({ newRun, runInProgress }: StoreDataFn) => {
     try {
         runHistory.runs = newRun ? [...runHistory.runs, newRun] : runHistory.runs;
         runHistory.runInProgress = runInProgress ? runInProgress : undefined;
+
+        debugger;
         const runHistoryString = JSON.stringify(runHistory)
         await AsyncStorage.setItem('@run_history', runHistoryString)
     } catch (e) {
@@ -28,8 +30,10 @@ export const storeData = async ({ newRun, runInProgress }: StoreDataFn) => {
 }
 
 export const getData = async () => {
+    debugger
     try {
         const value = await AsyncStorage.getItem('@run_history')
+        debugger
         if (value !== null) {
             const newRunHistory: RunHistory = JSON.parse(value);
 
@@ -39,4 +43,9 @@ export const getData = async () => {
     } catch (e) {
         console.error(e)
     }
+}
+
+export const reset = () => {
+    runHistory.runs = [];
+    runHistory.runInProgress = undefined;
 }
