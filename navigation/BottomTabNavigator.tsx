@@ -14,30 +14,30 @@ import RunTimerScreen from '../screens/RunTimerScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import { BottomTabParamList, RunTimerScreenTabParamList, TabTwoParamList } from '../types';
 
-const BottomTab = createBottomTabNavigator<BottomTabParamList>();
+const BottomTabs = createBottomTabNavigator<BottomTabParamList>();
 
 export default function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
   return (
-    <BottomTab.Navigator
+    <BottomTabs.Navigator
       initialRouteName="Run Timer"
       tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
-      <BottomTab.Screen
+      <BottomTabs.Screen
         name="Run Timer"
-        component={RunTimerScreenTabNavigator}
+        component={RunTimerScreen}
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
         }}
       />
-      <BottomTab.Screen
+      <BottomTabs.Screen
         name="History"
-        component={TabTwoNavigator}
+        component={HistoryScreen}
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
         }}
       />
-    </BottomTab.Navigator>
+    </BottomTabs.Navigator>
   );
 }
 
@@ -49,30 +49,21 @@ function TabBarIcon(props: { name: React.ComponentProps<typeof Ionicons>['name']
 
 // Each tab has its own navigation stack, you can read more about this pattern here:
 // https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
-const RunTimerScreenTabStack = createStackNavigator<RunTimerScreenTabParamList>();
+// const Stack = createStackNavigator<RunTimerScreenTabParamList>();
 
-function RunTimerScreenTabNavigator() {
-  return (
-    <RunTimerScreenTabStack.Navigator>
-      <RunTimerScreenTabStack.Screen
-        name="RunTimerScreen"
-        component={RunTimerScreen}
-        options={{ headerTitle: 'Run Timer' }}
-      />
-    </RunTimerScreenTabStack.Navigator>
-  );
-}
-
-const TabTwoStack = createStackNavigator<TabTwoParamList>();
-
-function TabTwoNavigator() {
-  return (
-    <TabTwoStack.Navigator>
-      <TabTwoStack.Screen
-        name="HistoryScreen"
-        component={HistoryScreen}
-        options={{ headerTitle: 'Run History' }}
-      />
-    </TabTwoStack.Navigator>
-  );
-}
+// function RunTimerScreenTabNavigator() {
+//   return (
+//     <Stack.Navigator>
+//       <Stack.Screen
+//         name="RunTimerScreen"
+//         component={RunTimerScreen}
+//         options={{ headerTitle: 'Run Timer' }}
+//       />
+//       <Stack.Screen
+//         name="c"
+//         component={HistoryScreen}
+//         options={{ headerTitle: 'Run History' }}
+//       />
+//     </Stack.Navigator>
+//   );
+// }
