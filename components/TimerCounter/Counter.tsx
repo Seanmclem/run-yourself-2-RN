@@ -170,6 +170,8 @@ export const Counter = () => {
                 const lastOrOnlyLap = LapsFromCurrentRun[runHistory.runInProgress.currentLapIndex]
                 debugger
                 if (lastOrOnlyLap) {
+                    clearInterval(diffInterval)
+
                     currentLapRef.current = { ...lastOrOnlyLap }
                     debugger;
 
