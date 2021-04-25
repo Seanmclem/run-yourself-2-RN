@@ -40,6 +40,7 @@ export const getData = async () => {
             runHistory.runs = newRunHistory.runs;
             runHistory.runInProgress = newRunHistory.runInProgress;
         }
+        return true
     } catch (e) {
         console.error(e)
     }
