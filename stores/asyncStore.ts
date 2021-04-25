@@ -16,10 +16,10 @@ export interface StoreDataFn {
     newRun?: Run,
     runInProgress?: Run
 }
-export const storeData = async ({ newRun, runInProgress }: StoreDataFn) => {
+export const storeData = async ({ newRun, runInProgress, clearRun }: StoreDataFn & { clearRun?: boolean }) => {
     try {
         runHistory.runs = newRun ? [...runHistory.runs, newRun] : runHistory.runs;
-        runHistory.runInProgress = runInProgress ? runInProgress : undefined;
+        runHistory.runInProgress = runInProgress || clearRun ? runInProgress : undefined;
 
         debugger;
         const runHistoryString = JSON.stringify(runHistory)

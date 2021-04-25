@@ -37,11 +37,13 @@ export const Counter = () => {
     const currentLapRef = useRef<Lap>({
         start: 0
     })
+    const runRef = useRef<Run>()
 
     useEffect(() => {
-        // AppState.addEventListener("change", _handleAppStateChange);
-
+        AppState.addEventListener("change", _handleAppStateChange);
+        _handleAppStateChange('active')
         return () => {
+            _handleAppStateChange('background')
             AppState.removeEventListener("change", _handleAppStateChange);
         };
     }, []);
@@ -51,18 +53,19 @@ export const Counter = () => {
     const getNowTimestamp = () => (new Date()).getTime()
 
     const startTimer = (resume?: boolean) => {
-        // if (!resume) {
-        const newTime = getNowTimestamp()
-        currentLapRef.current = { start: newTime }
+        if (resume !== true) {
+            const newTime = getNowTimestamp()
+            currentLapRef.current = { start: newTime }
 
-        const newRun: Run = {
-            overallStart: newTime,
-            laps: [],
-            currentLapIndex: 0,
-            isDone: false
+            const newRun: Run = {
+                overallStart: newTime,
+                laps: [],
+                currentLapIndex: 0,
+                isDone: false
+            }
+            setRun(newRun)
+            runRef.current = newRun
         }
-        setRun(newRun)
-        // }
 
         setDiffInterval(setInterval(looper, 50)) // TODO: make a ref..
     }
@@ -86,7 +89,7 @@ export const Counter = () => {
     const stopTimer = () => {
         const newRun = endLap(true)
         if (newRun) {
-            storeData({ newRun })
+            storeData({ newRun, clearRun: true })
         }
 
         currentLapRef.current = {
@@ -112,14 +115,14 @@ export const Counter = () => {
             const newRun: Run = {
                 overallStart: run.overallStart,
                 laps,
-                currentLapIndex: run.currentLapIndex + 1,
+                currentLapIndex: laps.length - 1,
                 overallDuration,
                 isDone: !!theEnd,
             }
             // ^here, need to save this^ to state-mgr/local-storage/db
 
-            console.log({ overallDuration })
             setRun(newRun)
+            runRef.current = newRun
 
             return newRun
         }
@@ -137,49 +140,57 @@ export const Counter = () => {
     const _handleAppStateChange = async (nextAppState: AppStateStatus) => {
         if (nextAppState === 'background') {
             console.log("App has gone Background!");
+            debugger;
+            console.log({ run })
+            if (runRef?.current) {
+                debugger
+                const laps = [...runRef.current.laps, currentLapRef.current]
+                const overallDuration = laps.reduce((prev, curr) => prev + (curr.duration || 0), 0)
 
-            if (run) {
-                const laps = [...run.laps, currentLapRef.current]
-
-                const newRun: Run = {
-                    overallStart: run.overallStart,
+                const runInProgress: Run = {
+                    overallStart: runRef.current.overallStart,
                     laps,
-                    currentLapIndex: run.currentLapIndex + 1,
-                    overallDuration: undefined,
+                    currentLapIndex: runRef.current.currentLapIndex + 1,
+                    overallDuration,
                     isDone: false,
                 }
 
-                runHistory.runInProgress = newRun;
+                runHistory.runInProgress = runInProgress;
+                storeData({ runInProgress })
             }
 
 
         }
         if (nextAppState === 'active') {
             await getData()
-
+            debugger;
+            console.log({ runHistory })
             if (runHistory?.runInProgress) {
                 const LapsFromCurrentRun = runHistory.runInProgress.laps
                 const lastOrOnlyLap = LapsFromCurrentRun[runHistory.runInProgress.currentLapIndex]
-
+                debugger
                 if (lastOrOnlyLap) {
                     currentLapRef.current = { ...lastOrOnlyLap }
                     debugger;
-                    runHistory.runInProgress.laps.splice(runHistory.runInProgress.currentLapIndex, 1)
+
+                    runHistory.runInProgress.laps.pop()
+                    // storeData({ clearRun: true })
                     debugger;
+
                     setRun(runHistory.runInProgress)
+                    runRef.current = runHistory.runInProgress
+
+                    storeData({ clearRun: true })
+
                     startTimer(true)
                 }
             }
-
-
             console.log("App has come to the gone ACTIVE")
         };
     }
 
     const isRunning = !(currentLapRef?.current?.start === 0)
     const overallDuration = (run?.overallDuration || 0) + (currentLapRef?.current?.duration || 0)
-
-    console.log({ overallDuration })
 
     return (
         <View style={styles.container}>
