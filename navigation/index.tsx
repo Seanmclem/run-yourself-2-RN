@@ -13,11 +13,16 @@ import { RootStackParamList } from '../types';
 import BottomTabNavigator from './BottomTabNavigator';
 import LinkingConfiguration from './LinkingConfiguration';
 
+const CustomDefaultTheme = {
+  ...DefaultTheme
+}
+
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      theme={colorScheme === 'dark' ? DarkTheme : CustomDefaultTheme} // checking system color, from useColorScheme() / parent
+    >
       <RootNavigator />
     </NavigationContainer>
   );
