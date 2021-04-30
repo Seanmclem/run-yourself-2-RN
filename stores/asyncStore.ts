@@ -2,27 +2,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { proxy } from 'valtio'
 import { Run } from '../components/TimerCounter/Counter';
 
-interface RunHistory {
-    runs: Run[],
+interface RunHistoryStore {
+    previousRuns: Run[],
     runInProgress?: Run,
 }
-export const runHistory = proxy<RunHistory>({
-    runs: [],
+export const runHistoryStore = proxy<RunHistoryStore>({
+    previousRuns: [],
     runInProgress: undefined,
 })
 
-// need valtio
-export interface StoreDataFn {
+
+export interface StoreDataFunctionn {
     newRun?: Run,
-    runInProgress?: Run
+    runInProgress?: Run,
+    clearRun?: boolean
 }
-export const storeData = async ({ newRun, runInProgress, clearRun }: StoreDataFn & { clearRun?: boolean }) => {
+export const storeData = async ({ newRun, runInProgress, clearRun }: StoreDataFunctionn) => {
     try {
-        runHistory.runs = newRun ? [...runHistory.runs, newRun] : runHistory.runs;
-        runHistory.runInProgress = runInProgress || clearRun ? runInProgress : undefined;
+        runHistoryStore.previousRuns = newRun ? [...runHistoryStore.previousRuns, newRun] : runHistoryStore.previousRuns;
+        runHistoryStore.runInProgress = runInProgress ? runInProgress : runHistoryStore.runInProgress
+        runHistoryStore.runInProgress = clearRun ? undefined : runHistoryStore.runInProgress;
 
         debugger;
-        const runHistoryString = JSON.stringify(runHistory)
+        const runHistoryString = JSON.stringify(runHistoryStore)
         await AsyncStorage.setItem('@run_history', runHistoryString)
     } catch (e) {
         console.error(e)
@@ -30,15 +32,14 @@ export const storeData = async ({ newRun, runInProgress, clearRun }: StoreDataFn
 }
 
 export const getData = async () => {
-    debugger
     try {
         const value = await AsyncStorage.getItem('@run_history')
-        debugger
-        if (value !== null) {
-            const newRunHistory: RunHistory = JSON.parse(value);
 
-            runHistory.runs = newRunHistory.runs;
-            runHistory.runInProgress = newRunHistory.runInProgress;
+        if (value !== null) {
+            const newRunHistory: RunHistoryStore = JSON.parse(value);
+
+            runHistoryStore.previousRuns = newRunHistory.previousRuns;
+            runHistoryStore.runInProgress = newRunHistory.runInProgress;
         }
         return true
     } catch (e) {
@@ -47,6 +48,6 @@ export const getData = async () => {
 }
 
 export const reset = () => {
-    runHistory.runs = [];
-    runHistory.runInProgress = undefined;
+    runHistoryStore.previousRuns = [];
+    runHistoryStore.runInProgress = undefined;
 }

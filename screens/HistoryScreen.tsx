@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { runHistory } from '../stores/asyncStore'
+import { runHistoryStore } from '../stores/asyncStore'
 import { useSnapshot } from 'valtio'
 
 import { Text, View } from '../components/Themed';
@@ -9,7 +9,7 @@ import { msDifferenceToCounter } from '../utils/functions';
 import dayjs from 'dayjs';
 
 export default function HistoryScreen() {
-  const runHistorySnap = useSnapshot(runHistory)
+  const runHistorySnapshot = useSnapshot(runHistoryStore)
 
   return (
     <View style={styles.container}>
@@ -17,7 +17,7 @@ export default function HistoryScreen() {
         Yo Run History
       </Text>
       <View>
-        {runHistorySnap.runs.map(run => {
+        {runHistorySnapshot.previousRuns.map(run => {
           const overallDate = (new Date(run.overallStart))
           const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
           return (

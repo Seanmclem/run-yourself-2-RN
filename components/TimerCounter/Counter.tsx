@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { AppState, AppStateStatus, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet } from 'react-native';
 
-import { runHistory, getData } from '../../stores/asyncStore'
+import { runHistoryStore } from '../../stores/asyncStore'
 
 import { View } from '../../components/Themed';
 import { ButtonArea } from './ButtonArea'
@@ -11,7 +11,7 @@ import { LapsList } from './LapsList';
 // 10 digit timestamp is milliseconds aka unix_timestamp
 // 
 
-import { storeData } from '../../stores/asyncStore'
+import { Spacer } from '../Spacer';
 
 export interface Lap {
     start: number,
@@ -24,47 +24,30 @@ export interface Run {
     overallEnd?: number,
     overallDuration?: number;
     laps: Lap[],
-    currentLapIndex: number
+    currentLapIndex?: number //remove me, use last lap duh wtf
     isDone: boolean,
 }
 
 export const Counter = () => {
     const [_, setCurrentTime] = useState<number>() // ticker for state updates
-
-    const [run, setRun] = useState<Run>()
     const [diffInterval, setDiffInterval] = useState<any>(undefined)
-
-    const currentLapRef = useRef<Lap>({
-        start: 0
-    })
-    const runRef = useRef<Run>()
-
-    useEffect(() => {
-        AppState.addEventListener("change", _handleAppStateChange);
-        _handleAppStateChange('active')
-        return () => {
-            _handleAppStateChange('background')
-            AppState.removeEventListener("change", _handleAppStateChange);
-        };
-    }, []);
-
-
 
     const getNowTimestamp = () => (new Date()).getTime()
 
     const startTimer = (resume?: boolean) => {
-        if (resume !== true) {
-            const newTime = getNowTimestamp()
-            currentLapRef.current = { start: newTime }
+        const resumingRunInProgress = resume === true;
 
-            const newRun: Run = {
+        if (!resumingRunInProgress) {
+            const newTime = getNowTimestamp()
+            const firstLap = { start: newTime }
+
+            runHistoryStore.runInProgress = {
                 overallStart: newTime,
-                laps: [],
-                currentLapIndex: 0,
+                laps: [firstLap],
                 isDone: false
             }
-            setRun(newRun)
-            runRef.current = newRun
+        } else {
+            //to do: something else?
         }
 
         setDiffInterval(setInterval(looper, 50)) // TODO: make a ref..
@@ -72,144 +55,67 @@ export const Counter = () => {
 
     const looper = () => {
         const newTime = getNowTimestamp()
-
-        if (currentLapRef) {
-            const originalStart = currentLapRef.current.start;
-            const newDuration = newTime - originalStart;
-
-            currentLapRef.current = {
-                start: originalStart,
-                duration: newDuration,
-            }
-        }
-
         setCurrentTime(newTime)
     }
 
     const stopTimer = () => {
-        const newRun = endLap(true)
-        if (newRun) {
-            storeData({ newRun, clearRun: true })
-        }
-
-        currentLapRef.current = {
-            start: 0,
-            duration: 0,
-        }
-        clearInterval(diffInterval)
-        setDiffInterval(undefined)
-        setCurrentTime(undefined)
+        completeLap()
+        completeRun()
     }
 
-    const endLap = (theEnd?: boolean) => {
-        currentLapRef.current = {
-            start: currentLapRef.current.start,
-            end: getNowTimestamp(),
-            duration: currentLapRef.current.duration,
-        }
-        debugger
-        if (run) {
-            const laps = [...run.laps, currentLapRef.current]
-            const overallDuration = laps.reduce((prev, curr) => prev + (curr.duration || 0), 0)
+    const completeLap = () => {
+        if (runHistoryStore.runInProgress) {
+            const lastLapIndex = runHistoryStore.runInProgress.laps.length - 1; //NEED to use SNAPSHOT?
+            const finalLap = runHistoryStore.runInProgress.laps[lastLapIndex]
+            const endTime = getNowTimestamp();
 
-            const newRun: Run = {
-                overallStart: run.overallStart,
-                laps,
-                currentLapIndex: laps.length - 1,
-                overallDuration,
-                isDone: !!theEnd,
+            const completedLap = {
+                start: finalLap.start,
+                end: endTime,
+                duration: endTime - finalLap.start, // maybe just use a function prototype instead... like a class but a function
             }
-            // ^here, need to save this^ to state-mgr/local-storage/db
 
-            setRun(newRun)
-            runRef.current = newRun
-
-            return newRun
+            runHistoryStore.runInProgress.laps[lastLapIndex] = completedLap;
         }
+    }
+
+    const startNewLap = () => {
+        if (runHistoryStore.runInProgress) {
+            const newLap = {
+                start: getNowTimestamp(),
+            }
+            const existingLaps = runHistoryStore.runInProgress.laps;
+            runHistoryStore.runInProgress.laps = [...existingLaps, newLap];
+        }
+    }
+
+    const completeRun = () => {
+        clearInterval(diffInterval)
+        setDiffInterval(undefined)
+        setCurrentTime(undefined) // also for runInProgress !!boolean
     }
 
     const nextLap = () => {
-        endLap()
-        currentLapRef.current = {
-            start: getNowTimestamp(),
-            duration: 0,
-        }
+        completeLap()
+        startNewLap()
     }
 
 
-    const _handleAppStateChange = async (nextAppState: AppStateStatus) => {
-        if (nextAppState === 'background') {
-            console.log("App has gone Background!");
-            debugger;
-            console.log({ run })
-            if (runRef?.current) {
-                debugger
-                const laps = [...runRef.current.laps, currentLapRef.current]
-                const overallDuration = laps.reduce((prev, curr) => prev + (curr.duration || 0), 0)
-
-                const runInProgress: Run = {
-                    overallStart: runRef.current.overallStart,
-                    laps,
-                    currentLapIndex: runRef.current.currentLapIndex + 1,
-                    overallDuration,
-                    isDone: false,
-                }
-
-                runHistory.runInProgress = runInProgress;
-                storeData({ runInProgress })
-            }
-
-
-        }
-        if (nextAppState === 'active') {
-            await getData()
-            debugger;
-            console.log({ runHistory })
-            if (runHistory?.runInProgress) {
-                const LapsFromCurrentRun = runHistory.runInProgress.laps
-                const lastOrOnlyLap = LapsFromCurrentRun[runHistory.runInProgress.currentLapIndex]
-                debugger
-                if (lastOrOnlyLap) {
-                    clearInterval(diffInterval)
-
-                    currentLapRef.current = { ...lastOrOnlyLap }
-                    debugger;
-
-                    runHistory.runInProgress.laps.pop()
-                    // storeData({ clearRun: true })
-                    debugger;
-
-                    setRun(runHistory.runInProgress)
-                    runRef.current = runHistory.runInProgress
-
-                    storeData({ clearRun: true })
-
-                    startTimer(true)
-                }
-            }
-            console.log("App has come to the gone ACTIVE")
-        };
-    }
-
-    const isRunning = !(currentLapRef?.current?.start === 0)
-    const overallDuration = (run?.overallDuration || 0) + (currentLapRef?.current?.duration || 0)
+    // const isRunning = !!runHistoryStore.runInProgress?.laps[runHistoryStore.runInProgress.laps.length - 1].duration
+    // const overallDuration = (run?.overallDuration || 0) + (currentLapRef?.current?.duration || 0)
 
     return (
         <View style={styles.container}>
-            <CurrentLapTicker
-                duration={currentLapRef?.current?.duration}
-                overallDuration={overallDuration}
-                isFirstLap={!!run?.laps?.length}
+            <Spacer
+                height={50}
+                width={'100%'}
             />
 
-            <LapsList
-                laps={run?.laps}
-                isDone={!!run?.isDone}
-                overallDuration={run?.overallDuration}
-            />
+            <CurrentLapTicker />
+
+            <LapsList />
 
             <ButtonArea
-                isRunning={isRunning}
                 startTimer={startTimer}
                 nextLap={nextLap}
                 stopTimer={stopTimer}

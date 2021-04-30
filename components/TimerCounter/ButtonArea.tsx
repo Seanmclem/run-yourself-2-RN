@@ -1,17 +1,24 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
+import { runHistoryStore } from '../../stores/asyncStore'
+import { useSnapshot } from 'valtio'
+
 import { View } from '../../components/Themed';
 import { AppButton } from '../AppButton';
 import { Spacer } from '../Spacer';
+import { Lap } from './Counter';
 
 interface props {
-    isRunning: boolean;
     startTimer: any;
     nextLap: any;
     stopTimer: any;
 }
 
-export const ButtonArea: React.FC<props> = ({ isRunning, startTimer, nextLap, stopTimer }) => {
+export const ButtonArea: React.FC<props> = ({ startTimer, nextLap, stopTimer }) => {
+    const runHistorySnapshot = useSnapshot(runHistoryStore);
+    const laps: Lap[] = runHistorySnapshot.runInProgress?.laps || [];
+    const isRunning: boolean = !laps[length - 1]?.duration;
+
     return (
         <View style={styles.container}>
             { !isRunning && (
