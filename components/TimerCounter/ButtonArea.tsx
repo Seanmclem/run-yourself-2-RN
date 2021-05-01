@@ -17,8 +17,9 @@ interface props {
 export const ButtonArea: React.FC<props> = ({ startTimer, nextLap, stopTimer }) => {
     const runHistorySnapshot = useSnapshot(runHistoryStore);
     const laps: Lap[] = runHistorySnapshot.runInProgress?.laps || [];
-    const isRunning: boolean = !laps[length - 1]?.duration;
-
+    const currentLap = laps[laps.length - 1];
+    const isRunning: boolean = currentLap && !currentLap.duration
+    debugger
     return (
         <View style={styles.container}>
             { !isRunning && (

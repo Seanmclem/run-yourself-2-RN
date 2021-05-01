@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
     }
 });
 
+export const getNowTimestamp = () => (new Date()).getTime()
 
 export const msDifferenceToCounter = (duration: number, hideMilliseconds?: boolean) => {
     let seconds: string | number = Math.floor((duration / 1000) % 60);

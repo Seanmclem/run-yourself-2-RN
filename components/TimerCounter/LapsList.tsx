@@ -33,7 +33,7 @@ export const LapsList: React.FC<props> = () => {
 
                 {laps.map((lap, index) => {
                     console.log({ laps: { ...laps } })
-                    debugger
+                    //debugger
                     return (
                         lap.duration && (
                             <Text key={lap.start} style={styles.item}>

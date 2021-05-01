@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { runHistoryStore } from '../../stores/asyncStore'
 
@@ -8,10 +9,12 @@ import { ButtonArea } from './ButtonArea'
 import { CurrentLapTicker } from './CurrentLapTicker';
 import { LapsList } from './LapsList';
 
+
 // 10 digit timestamp is milliseconds aka unix_timestamp
 // 
 
 import { Spacer } from '../Spacer';
+import { getNowTimestamp } from '../../utils/functions';
 
 export interface Lap {
     start: number,
@@ -25,29 +28,39 @@ export interface Run {
     overallDuration?: number;
     laps: Lap[],
     currentLapIndex?: number //remove me, use last lap duh wtf
-    isDone: boolean,
 }
 
 export const Counter = () => {
+    useEffect(() => {
+        initRunInProgress()
+    }, [])
+
+    const initRunInProgress = async () => {
+        const runInProgress_storage = await AsyncStorage.getItem('@run_in_progress')
+
+        if (runInProgress_storage !== null) {
+            const newRunHistory: Run = JSON.parse(runInProgress_storage);
+            runHistoryStore.runInProgress = newRunHistory;
+            const resume = true
+            startTimer(resume)
+        }
+    }
+
+
     const [_, setCurrentTime] = useState<number>() // ticker for state updates
     const [diffInterval, setDiffInterval] = useState<any>(undefined)
 
-    const getNowTimestamp = () => (new Date()).getTime()
-
     const startTimer = (resume?: boolean) => {
-        const resumingRunInProgress = resume === true;
+        const isNewRun = resume !== true; //
 
-        if (!resumingRunInProgress) {
+        if (isNewRun) {
             const newTime = getNowTimestamp()
             const firstLap = { start: newTime }
 
             runHistoryStore.runInProgress = {
                 overallStart: newTime,
                 laps: [firstLap],
-                isDone: false
             }
-        } else {
-            //to do: something else?
         }
 
         setDiffInterval(setInterval(looper, 50)) // TODO: make a ref..
@@ -86,19 +99,25 @@ export const Counter = () => {
             }
             const existingLaps = runHistoryStore.runInProgress.laps;
             runHistoryStore.runInProgress.laps = [...existingLaps, newLap];
+            // need to put in storage
+            AsyncStorage.setItem('@run_in_progress', JSON.stringify(runHistoryStore.runInProgress))
         }
-    }
-
-    const completeRun = () => {
-        clearInterval(diffInterval)
-        setDiffInterval(undefined)
-        setCurrentTime(undefined) // also for runInProgress !!boolean
     }
 
     const nextLap = () => {
         completeLap()
         startNewLap()
     }
+
+    const completeRun = () => {
+        clearInterval(diffInterval)
+        setDiffInterval(undefined)
+        setCurrentTime(undefined)
+        // need to put in storage
+        AsyncStorage.setItem('@run_in_progress', JSON.stringify(runHistoryStore.runInProgress))
+    }
+
+
 
 
     // const isRunning = !!runHistoryStore.runInProgress?.laps[runHistoryStore.runInProgress.laps.length - 1].duration
