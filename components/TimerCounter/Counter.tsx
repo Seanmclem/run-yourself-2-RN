@@ -41,8 +41,11 @@ export const Counter = () => {
         if (runInProgress_storage !== null) {
             const newRunHistory: Run = JSON.parse(runInProgress_storage);
             runHistoryStore.runInProgress = newRunHistory;
-            const resume = true
-            startTimer(resume)
+            const lastLap = runHistoryStore.runInProgress?.laps[runHistoryStore.runInProgress.laps.length - 1]
+            const completed = !!(lastLap && lastLap?.duration)
+            const isResuming = true
+
+            startTimer({ isResuming, completed })
         }
     }
 
@@ -50,8 +53,8 @@ export const Counter = () => {
     const [_, setCurrentTime] = useState<number>() // ticker for state updates
     const [diffInterval, setDiffInterval] = useState<any>(undefined)
 
-    const startTimer = (resume?: boolean) => {
-        const isNewRun = resume !== true; //
+    const startTimer = ({ isResuming, completed }: { isResuming?: boolean, completed?: boolean }) => {
+        const isNewRun = isResuming !== true; //
 
         if (isNewRun) {
             const newTime = getNowTimestamp()
@@ -63,7 +66,7 @@ export const Counter = () => {
             }
         }
 
-        setDiffInterval(setInterval(looper, 50)) // TODO: make a ref..
+        !completed && setDiffInterval(setInterval(looper, 50)) // TODO: make a ref..
     }
 
     const looper = () => {

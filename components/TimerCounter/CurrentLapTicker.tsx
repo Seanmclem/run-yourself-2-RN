@@ -15,7 +15,8 @@ export const CurrentLapTicker: React.FC<{}> = () => {
     const isFirstLap = runHistorySnapshot.runInProgress?.laps.length === 1
 
     const now = getNowTimestamp()
-    const currentLapDuration = currentLap?.start ? (now - currentLap.start) : 0
+    const currentLapDuration = currentLap?.duration || (currentLap?.start ? (now - currentLap.start) : 0)
+
     const reducer = (prev: any, curr: Lap) => prev + (curr.duration || now - curr.start)
     const overallDuration = runHistorySnapshot.runInProgress?.laps.reduce(reducer, 0) || 0
 
