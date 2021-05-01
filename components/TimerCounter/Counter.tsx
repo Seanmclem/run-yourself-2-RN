@@ -64,6 +64,7 @@ export const Counter = () => {
                 overallStart: newTime,
                 laps: [firstLap],
             }
+            AsyncStorage.setItem('@run_in_progress', JSON.stringify(runHistoryStore.runInProgress))
         }
 
         !completed && setDiffInterval(setInterval(looper, 50)) // TODO: make a ref..
