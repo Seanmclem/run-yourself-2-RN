@@ -1,14 +1,32 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { runHistoryStore } from '../stores/asyncStore'
 import { useSnapshot } from 'valtio'
 
 import { Text, View } from '../components/Themed';
-import { msDifferenceToCounter } from '../utils/functions';
+import { getNowTimestamp, msDifferenceToCounter } from '../utils/functions';
 import dayjs from 'dayjs';
+import { RUN_HISTORY } from '../conts_types_etc/constants';
+import { Lap, Run } from '../components/TimerCounter/Counter';
+import { useEffect } from 'react';
+
+
+const initRunHistory = async () => {
+  const runHistory_storage = await AsyncStorage.getItem(RUN_HISTORY)
+
+  if (runHistory_storage !== null) {
+    const newRunHistory: Run[] = JSON.parse(runHistory_storage);
+    runHistoryStore.run_history = newRunHistory;
+  }
+}
 
 export default function HistoryScreen() {
+  useEffect(() => {
+    initRunHistory()
+  }, [])
+
   const runHistorySnapshot = useSnapshot(runHistoryStore)
 
   return (
@@ -17,12 +35,17 @@ export default function HistoryScreen() {
         Yo Run History
       </Text>
       <View>
-        {runHistorySnapshot.previousRuns.map(run => {
+        {runHistorySnapshot.run_history.map(run => {
           const overallDate = (new Date(run.overallStart))
           const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
+
+          const now = getNowTimestamp()
+          const reducer = (prev: any, curr: Lap) => prev + (curr.duration || now - curr.start)
+          const overallDuration = run.laps.reduce(reducer, 0)
+
           return (
             <Text key={run.overallStart}>
-              {`${formattedOverallDateString} - Total: `} {msDifferenceToCounter(run.overallDuration || 0)}
+              {`${formattedOverallDateString} - Total: `} {msDifferenceToCounter(overallDuration || 0)}
             </Text>
           )
         })}

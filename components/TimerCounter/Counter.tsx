@@ -15,6 +15,7 @@ import { LapsList } from './LapsList';
 
 import { Spacer } from '../Spacer';
 import { getNowTimestamp } from '../../utils/functions';
+import { RUN_HISTORY, RUN_IN_PROGRESS } from '../../conts_types_etc/constants';
 
 export interface Lap {
     start: number,
@@ -25,7 +26,6 @@ export interface Lap {
 export interface Run {
     overallStart: number,
     overallEnd?: number,
-    overallDuration?: number;
     laps: Lap[],
     currentLapIndex?: number //remove me, use last lap duh wtf
 }
@@ -36,7 +36,7 @@ export const Counter = () => {
     }, [])
 
     const initRunInProgress = async () => {
-        const runInProgress_storage = await AsyncStorage.getItem('@run_in_progress')
+        const runInProgress_storage = await AsyncStorage.getItem(RUN_IN_PROGRESS)
 
         if (runInProgress_storage !== null) {
             const newRunHistory: Run = JSON.parse(runInProgress_storage);
@@ -64,7 +64,7 @@ export const Counter = () => {
                 overallStart: newTime,
                 laps: [firstLap],
             }
-            AsyncStorage.setItem('@run_in_progress', JSON.stringify(runHistoryStore.runInProgress))
+            AsyncStorage.setItem(RUN_IN_PROGRESS, JSON.stringify(runHistoryStore.runInProgress))
         }
 
         !completed && setDiffInterval(setInterval(looper, 50)) // TODO: make a ref..
@@ -103,8 +103,7 @@ export const Counter = () => {
             }
             const existingLaps = runHistoryStore.runInProgress.laps;
             runHistoryStore.runInProgress.laps = [...existingLaps, newLap];
-            // need to put in storage
-            AsyncStorage.setItem('@run_in_progress', JSON.stringify(runHistoryStore.runInProgress))
+            AsyncStorage.setItem(RUN_IN_PROGRESS, JSON.stringify(runHistoryStore.runInProgress))
         }
     }
 
@@ -117,15 +116,10 @@ export const Counter = () => {
         clearInterval(diffInterval)
         setDiffInterval(undefined)
         setCurrentTime(undefined)
-        // need to put in storage
-        AsyncStorage.setItem('@run_in_progress', JSON.stringify(runHistoryStore.runInProgress))
+        AsyncStorage.setItem(RUN_IN_PROGRESS, JSON.stringify(runHistoryStore.runInProgress))
+        runHistoryStore.runInProgress && (runHistoryStore.run_history = [...(runHistoryStore.run_history || []), runHistoryStore.runInProgress])
+        AsyncStorage.setItem(RUN_HISTORY, JSON.stringify(runHistoryStore.run_history))
     }
-
-
-
-
-    // const isRunning = !!runHistoryStore.runInProgress?.laps[runHistoryStore.runInProgress.laps.length - 1].duration
-    // const overallDuration = (run?.overallDuration || 0) + (currentLapRef?.current?.duration || 0)
 
     return (
         <View style={styles.container}>
