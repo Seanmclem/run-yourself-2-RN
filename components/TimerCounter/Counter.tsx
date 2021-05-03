@@ -53,7 +53,8 @@ export const Counter = () => {
     const [_, setCurrentTime] = useState<number>() // ticker for state updates
     const [diffInterval, setDiffInterval] = useState<any>(undefined)
 
-    const startTimer = ({ isResuming, completed }: { isResuming?: boolean, completed?: boolean }) => {
+    interface IStartTimerFn { isResuming?: boolean, completed?: boolean }
+    const startTimer = ({ isResuming, completed }: IStartTimerFn) => {
         const isNewRun = isResuming !== true; //
 
         if (isNewRun) {

@@ -16,7 +16,7 @@ exports[`ButtonArea tests renders correctly 1`] = `
 >
   <View
     accessible={true}
-    focusable={false}
+    focusable={true}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}

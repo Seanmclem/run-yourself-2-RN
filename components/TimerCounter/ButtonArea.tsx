@@ -8,13 +8,13 @@ import { AppButton } from '../AppButton';
 import { Spacer } from '../Spacer';
 import { Lap } from './Counter';
 
-interface props {
+export interface ButtonAreaProps {
     startTimer: any;
     nextLap: any;
     stopTimer: any;
 }
 
-export const ButtonArea: React.FC<props> = ({ startTimer, nextLap, stopTimer }) => {
+export const ButtonArea: React.FC<ButtonAreaProps> = ({ startTimer, nextLap, stopTimer }) => {
     const runHistorySnapshot = useSnapshot(runHistoryStore);
     const laps: Lap[] = runHistorySnapshot.runInProgress?.laps || [];
     const currentLap = laps[laps.length - 1];
