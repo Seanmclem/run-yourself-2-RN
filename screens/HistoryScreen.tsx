@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { List } from 'react-native-paper';
 
 import { runHistoryStore } from '../stores/asyncStore'
 import { useSnapshot } from 'valtio'
@@ -31,10 +32,8 @@ export default function HistoryScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Yo Run History
-      </Text>
-      <View>
+      <List.Section title="Run History">
+
         {runHistorySnapshot.run_history.map(run => {
           const overallDate = (new Date(run.overallStart))
           const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
@@ -44,12 +43,16 @@ export default function HistoryScreen() {
           const overallDuration = run.laps.reduce(reducer, 0)
 
           return (
-            <Text key={run.overallStart}>
-              {`${formattedOverallDateString} - Total: `} {msDifferenceToCounter(overallDuration || 0)}
-            </Text>
+            <List.Accordion key={run.overallStart} style={styles.accordionControl}
+              title={`${formattedOverallDateString} - Total: ${msDifferenceToCounter(overallDuration || 0, false, true)}`}>
+              <Text>
+                Detail studff
+              </Text>
+            </List.Accordion>
           )
         })}
-      </View>
+      </List.Section>
+
     </View>
   );
 }
@@ -68,5 +71,9 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  accordionControl: {
+    height: 40,
+    justifyContent: 'center',
   },
 });

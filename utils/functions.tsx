@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
 
 export const getNowTimestamp = () => (new Date()).getTime()
 
-export const msDifferenceToCounter = (duration: number, hideMilliseconds?: boolean) => {
+export const msDifferenceToCounter = (duration: number, hideMilliseconds?: boolean, hideJSX?: boolean) => {
     let seconds: string | number = Math.floor((duration / 1000) % 60);
     let minutes: string | number = Math.floor((duration / (1000 * 60)) % 60);
     let hours: string | number = Math.floor((duration / (1000 * 60 * 60)) % 24);
@@ -27,6 +27,6 @@ export const msDifferenceToCounter = (duration: number, hideMilliseconds?: boole
     const ss = `${seconds ? `${seconds}` : ''}`;
     const ms = `${!hideMilliseconds ? `:${milliseconds}` : ''}`
 
-    return <Text>{hh}{mm}{ss}<Text style={styles.milliseconds}>{ms}</Text></Text>;
+    return hideJSX ? `${hh}${mm}${ss}${ms}` : (<Text>{hh}{mm}{ss}<Text style={styles.milliseconds}>{ms}</Text></Text>);
 
 }
