@@ -2,9 +2,9 @@ import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { runHistoryStore } from '../../stores/asyncStore'
 import { useSnapshot } from 'valtio'
+import { Button } from 'react-native-paper';
 
 import { View } from '../../components/Themed';
-import { AppButton } from '../AppButton';
 import { Spacer } from '../Spacer';
 import { Lap } from './Counter';
 
@@ -14,36 +14,39 @@ export interface ButtonAreaProps {
     stopTimer: any;
 }
 
+const TimerButton = ({ onPress, children }: { onPress: any, children: any }) => (
+    <Button mode="contained" dark onPress={onPress} color="#009688">
+        {children}
+    </Button>
+)
+
 export const ButtonArea: React.FC<ButtonAreaProps> = ({ startTimer, nextLap, stopTimer }) => {
     const runHistorySnapshot = useSnapshot(runHistoryStore);
     const laps: Lap[] = runHistorySnapshot.runInProgress?.laps || [];
     const currentLap = laps[laps.length - 1];
     const isRunning: boolean = currentLap && !currentLap.duration
-    debugger
+
     return (
         <View style={styles.container}>
             { !isRunning && (
                 <>
-                    <AppButton
-                        onPress={startTimer}
-                        title="Start Timer"
-                    />
+                    <TimerButton onPress={startTimer}>
+                        Start Timer
+                    </TimerButton>
                 </>
             )}
             { isRunning && (
                 <>
-                    <AppButton
-                        onPress={nextLap}
-                        title="LAP"
-                    />
+                    <TimerButton onPress={nextLap}>
+                        Lap
+                    </TimerButton>
                     <Spacer
                         width={50}
                         height={20}
                     />
-                    <AppButton
-                        onPress={stopTimer}
-                        title="Stop Timer"
-                    />
+                    <TimerButton onPress={stopTimer}>
+                        Stop Timer
+                    </TimerButton>
                 </>
             )}
         </View>
