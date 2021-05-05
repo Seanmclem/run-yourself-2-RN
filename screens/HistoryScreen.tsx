@@ -34,7 +34,7 @@ export default function HistoryScreen() {
     <View style={styles.container}>
       <List.Section title="Run History">
 
-        {runHistorySnapshot.run_history.length === 5 ? runHistorySnapshot.run_history.map(run => {
+        {runHistorySnapshot.run_history.length ? runHistorySnapshot.run_history.map(run => {
           const overallDate = (new Date(run.overallStart))
           const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
 
