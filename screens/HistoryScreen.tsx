@@ -35,40 +35,7 @@ export default function HistoryScreen() {
     <ScrollView style={styles.container}>
       <List.Section title="Run History" style={styles.section}>
 
-        {runHistorySnapshot.run_history.length ? runHistorySnapshot.run_history.map(run => {
-          const overallDate = (new Date(run.overallStart))
-          const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
-
-          const now = getNowTimestamp()
-          const reducer = (prev: any, curr: Lap) => prev + (curr.duration || now - curr.start)
-          const overallDuration = run.laps.reduce(reducer, 0)
-
-          return (
-            <List.Accordion key={run.overallStart.toString()}
-              title={`${formattedOverallDateString} - Total: ${msDifferenceToCounter(overallDuration || 0, false, true)}`}
-              theme={{ colors: { primary: '#009688' } }}
-            >
-              <View style={styles.accordionBody}>
-                <Text>
-                  Started: {dayjs(run.overallStart).format('hh:mm:ss a')}
-                </Text>
-                <Text>
-                  Ended: {run.overallEnd ? dayjs(run.overallEnd).format('hh:mm:ss a') : 'in-progress...'}
-                </Text>
-                <View style={styles.lapsList}>
-                  <Text>
-                    Laps:
-                  </Text>
-                  {run.laps.map((lap, index) => (
-                    <Text>
-                      {index + 1}: {lap.duration ? msDifferenceToCounter(lap.duration) : 'in-progress...'}
-                    </Text>
-                  ))}
-                </View>
-              </View>
-            </List.Accordion>
-          )
-        }) : (
+        {runHistorySnapshot.run_history.length ? runHistorySnapshot.run_history.map(run => <RunRecord key={run.overallStart.toString()} run={run} />) : (
           <Text style={styles.pagging}>
             You currently have no previous runs. Get to it!
           </Text>
@@ -118,3 +85,38 @@ const styles = StyleSheet.create({
     marginTop: 7,
   }
 });
+
+const RunRecord = ({ run, key }: { run: Run, key: string }) => {
+  const overallDate = (new Date(run.overallStart))
+  const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
+
+  const now = getNowTimestamp()
+  const reducer = (prev: any, curr: Lap) => prev + (curr.duration || now - curr.start)
+  const overallDuration = run.laps.reduce(reducer, 0)
+
+  return (
+    <List.Accordion key={key}
+      title={`${formattedOverallDateString} - Total: ${msDifferenceToCounter(overallDuration || 0, false, true)}`}
+      theme={{ colors: { primary: '#009688' } }}
+    >
+      <View style={styles.accordionBody}>
+        <Text>
+          Started: {dayjs(run.overallStart).format('hh:mm:ss a')}
+        </Text>
+        <Text>
+          Ended: {run.overallEnd ? dayjs(run.overallEnd).format('hh:mm:ss a') : 'in-progress...'}
+        </Text>
+        <View style={styles.lapsList}>
+          <Text>
+            Laps:
+          </Text>
+          {run.laps.map((lap, index) => (
+            <Text>
+              {index + 1}: {lap.duration ? msDifferenceToCounter(lap.duration) : 'in-progress...'}
+            </Text>
+          ))}
+        </View>
+      </View>
+    </List.Accordion>
+  )
+}
