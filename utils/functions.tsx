@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     milliseconds: {
-        color: 'darkgray',
+        color: '#696969',
     }
 });
 
@@ -25,7 +25,7 @@ export const msDifferenceToCounter = (duration: number, hideMilliseconds?: boole
     const hh = hours !== '00' ? `${hours}:` : '';
     const mm = minutes ? `${minutes}:` : ''
     const ss = `${seconds ? `${seconds}` : ''}`;
-    const ms = `${!hideMilliseconds ? `:${milliseconds}` : ''}`
+    const ms = `${!hideMilliseconds ? `.${milliseconds}` : ''}`
 
     return hideJSX ? `${hh}${mm}${ss}${ms}` : (<Text darkColor={doDark ? "black" : ""}>{hh}{mm}{ss}<Text style={styles.milliseconds}>{ms}</Text></Text>);
 

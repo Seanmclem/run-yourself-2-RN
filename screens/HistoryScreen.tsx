@@ -34,14 +34,12 @@ export default function HistoryScreen() {
   return (
     <ScrollView style={styles.container}>
       <List.Section title="Run History" style={styles.section}>
-
         {runHistorySnapshot.run_history.length ? runHistorySnapshot.run_history.map(run => <RunRecord key={run.overallStart.toString()} run={run} />) : (
           <Text style={styles.pagging}>
             You currently have no previous runs. Get to it!
           </Text>
         )}
       </List.Section>
-
     </ScrollView>
   );
 }
