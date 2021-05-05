@@ -34,7 +34,7 @@ export default function HistoryScreen() {
     <View style={styles.container}>
       <List.Section title="Run History">
 
-        {runHistorySnapshot.run_history.map(run => {
+        {runHistorySnapshot.run_history.length === 5 ? runHistorySnapshot.run_history.map(run => {
           const overallDate = (new Date(run.overallStart))
           const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
 
@@ -44,7 +44,9 @@ export default function HistoryScreen() {
 
           return (
             <List.Accordion key={run.overallStart} style={styles.accordionControl}
-              title={`${formattedOverallDateString} - Total: ${msDifferenceToCounter(overallDuration || 0, false, true)}`}>
+              title={`${formattedOverallDateString} - Total: ${msDifferenceToCounter(overallDuration || 0, false, true)}`}
+              theme={{ colors: { primary: '#009688' } }}
+            >
               <View style={styles.accordionBody}>
                 <Text>
                   Started: {dayjs(run.overallStart).format('hh:mm:ss a')}
@@ -65,7 +67,11 @@ export default function HistoryScreen() {
               </View>
             </List.Accordion>
           )
-        })}
+        }) : (
+          <Text style={styles.pagging}>
+            You currently have no previous runs. Get to it!
+          </Text>
+        )}
       </List.Section>
 
     </View>
@@ -73,10 +79,14 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
+  pagging: {
+    margin: 30
+  },
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    // flex: 1,
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // height: '100%',
   },
   title: {
     // fontSize: 20,
