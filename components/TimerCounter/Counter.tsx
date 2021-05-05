@@ -27,7 +27,6 @@ export interface Run {
     overallStart: number,
     overallEnd?: number,
     laps: Lap[],
-    currentLapIndex?: number //remove me, use last lap duh wtf
 }
 
 export const Counter = () => {
@@ -117,6 +116,8 @@ export const Counter = () => {
         clearInterval(diffInterval)
         setDiffInterval(undefined)
         setCurrentTime(undefined)
+        runHistoryStore.runInProgress!.overallEnd = getNowTimestamp()
+
         AsyncStorage.setItem(RUN_IN_PROGRESS, JSON.stringify(runHistoryStore.runInProgress))
         runHistoryStore.runInProgress && (runHistoryStore.run_history = [...(runHistoryStore.run_history || []), runHistoryStore.runInProgress])
         AsyncStorage.setItem(RUN_HISTORY, JSON.stringify(runHistoryStore.run_history))
