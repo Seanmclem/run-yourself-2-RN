@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import { RUN_HISTORY } from '../conts_types_etc/constants';
 import { Lap, Run } from '../components/TimerCounter/Counter';
 import { useEffect } from 'react';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 const initRunHistory = async () => {
@@ -31,8 +32,8 @@ export default function HistoryScreen() {
   const runHistorySnapshot = useSnapshot(runHistoryStore)
 
   return (
-    <View style={styles.container}>
-      <List.Section title="Run History">
+    <ScrollView style={styles.container}>
+      <List.Section title="Run History" style={styles.section}>
 
         {runHistorySnapshot.run_history.length ? runHistorySnapshot.run_history.map(run => {
           const overallDate = (new Date(run.overallStart))
@@ -43,7 +44,7 @@ export default function HistoryScreen() {
           const overallDuration = run.laps.reduce(reducer, 0)
 
           return (
-            <List.Accordion key={run.overallStart} style={styles.accordionControl}
+            <List.Accordion key={run.overallStart.toString()}
               title={`${formattedOverallDateString} - Total: ${msDifferenceToCounter(overallDuration || 0, false, true)}`}
               theme={{ colors: { primary: '#009688' } }}
             >
@@ -74,16 +75,21 @@ export default function HistoryScreen() {
         )}
       </List.Section>
 
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   pagging: {
-    margin: 30
+    marginVertical: 30
+  },
+  section: {
+    paddingBottom: 100,
+    color: 'white'
   },
   container: {
-    // flex: 1,
+    paddingVertical: 30,
+    flex: 1,
     // alignItems: 'center',
     // justifyContent: 'center',
     // height: '100%',
@@ -97,10 +103,10 @@ const styles = StyleSheet.create({
     height: 1,
     width: '80%',
   },
-  accordionControl: {
-    height: 40,
-    justifyContent: 'center',
-  },
+  // accordionControl: {
+  //   height: 40,
+  //   justifyContent: 'center',
+  // },
   accordionBody: {
     backgroundColor: 'gray',
     marginHorizontal: 20,
