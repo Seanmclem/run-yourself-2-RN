@@ -44,7 +44,6 @@ export default function HistoryScreen() {
 
           return (
             <List.Accordion key={run.overallStart} style={styles.accordionControl}
-              titleStyle={ }
               title={`${formattedOverallDateString} - Total: ${msDifferenceToCounter(overallDuration || 0, false, true)}`}>
               <View style={styles.accordionBody}>
                 <Text>
