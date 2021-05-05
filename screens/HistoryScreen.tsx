@@ -75,18 +75,18 @@ const styles = StyleSheet.create({
   //   justifyContent: 'center',
   // },
   accordionBody: {
-    backgroundColor: 'gray',
+    backgroundColor: '#D3D3D3',
     marginHorizontal: 20,
     padding: 10,
   },
   lapsList: {
-    backgroundColor: 'dimgray',
+    backgroundColor: '#D3D3D3',
     padding: 12,
     marginTop: 7,
   }
 });
 
-const RunRecord = ({ run, key }: { run: Run, key: string }) => {
+const RunRecord = ({ run }: { run: Run }) => {
   const overallDate = (new Date(run.overallStart))
   const formattedOverallDateString = dayjs(overallDate).format('MMM DD, YYYY')
 
@@ -95,24 +95,24 @@ const RunRecord = ({ run, key }: { run: Run, key: string }) => {
   const overallDuration = run.laps.reduce(reducer, 0)
 
   return (
-    <List.Accordion key={key}
+    <List.Accordion
       title={`${formattedOverallDateString} - Total: ${msDifferenceToCounter(overallDuration || 0, false, true)}`}
       theme={{ colors: { primary: '#009688' } }}
     >
       <View style={styles.accordionBody}>
-        <Text>
+        <Text darkColor="black">
           Started: {dayjs(run.overallStart).format('hh:mm:ss a')}
         </Text>
-        <Text>
+        <Text darkColor="black">
           Ended: {run.overallEnd ? dayjs(run.overallEnd).format('hh:mm:ss a') : 'in-progress...'}
         </Text>
         <View style={styles.lapsList}>
-          <Text>
+          <Text darkColor="black">
             Laps:
           </Text>
           {run.laps.map((lap, index) => (
-            <Text>
-              {index + 1}: {lap.duration ? msDifferenceToCounter(lap.duration) : 'in-progress...'}
+            <Text key={lap.start} darkColor="black">
+              {index + 1}: {lap.duration ? msDifferenceToCounter(lap.duration, false, false, true) : 'in-progress...'}
             </Text>
           ))}
         </View>

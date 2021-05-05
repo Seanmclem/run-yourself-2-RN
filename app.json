@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "run-yourself-2",
-    "slug": "run-yourself-2",
+    "name": "Run Yourself",
+    "slug": "run-yourself",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "runyourself",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -19,9 +19,13 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.seanmclements.runyourself",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.seanmclements.runyourself",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
