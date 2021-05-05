@@ -44,10 +44,26 @@ export default function HistoryScreen() {
 
           return (
             <List.Accordion key={run.overallStart} style={styles.accordionControl}
+              titleStyle={ }
               title={`${formattedOverallDateString} - Total: ${msDifferenceToCounter(overallDuration || 0, false, true)}`}>
-              <Text>
-                Detail studff
-              </Text>
+              <View style={styles.accordionBody}>
+                <Text>
+                  Started: {dayjs(run.overallStart).format('hh:mm:ss a')}
+                </Text>
+                <Text>
+                  Ended: {run.overallEnd ? dayjs(run.overallEnd).format('hh:mm:ss a') : 'in-progress...'}
+                </Text>
+                <View style={styles.lapsList}>
+                  <Text>
+                    Laps:
+                  </Text>
+                  {run.laps.map((lap, index) => (
+                    <Text>
+                      {index + 1}: {lap.duration ? msDifferenceToCounter(lap.duration) : 'in-progress...'}
+                    </Text>
+                  ))}
+                </View>
+              </View>
             </List.Accordion>
           )
         })}
@@ -64,8 +80,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    // fontSize: 20,
+    // fontWeight: 'bold',
   },
   separator: {
     marginVertical: 30,
@@ -76,4 +92,14 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
   },
+  accordionBody: {
+    backgroundColor: 'gray',
+    marginHorizontal: 20,
+    padding: 10,
+  },
+  lapsList: {
+    backgroundColor: 'dimgray',
+    padding: 12,
+    marginTop: 7,
+  }
 });
